@@ -10,8 +10,10 @@ const app = express();
  const session = require('express-session');
  const passport = require('passport');
  const passportLocal = require('./config/passport-local-strategy');
+ const passportJWT = require('./config/passport-jwt-strategy');
  const MongoStore = require('connect-mongo')(session);
-
+const flash = require('connect-flash');
+const customMware = require('./config/middleware');
 
 //calling cookie parser to use cookies
  app.use(express.urlencoded());
@@ -20,6 +22,8 @@ const app = express();
 
  //linking static files
  app.use(express.static('./assets'));
+//make the uploads paths available to the browser
+ app.use('/uploads', express.static(__dirname + '/uploads'));
 
  //using express layouts
  app.use(expressLayouts);
@@ -58,6 +62,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(passport.setAuthenticatedUser);
+
+app.use(flash());
+app.use(customMware.setFlash);
 
 //use express router
 app.use('/', require('./routes'));
